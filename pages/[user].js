@@ -1,6 +1,5 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import axios from 'axios'
 
 export default function Home({user}) {
   return (
@@ -13,7 +12,6 @@ export default function Home({user}) {
 
       <h1>{user.displayName}</h1>
       <h1>{user.email}</h1>
-      <p>{user.userdata_id.bio}</p>
       <img src={user.imgurl} alt="user"/>
 
     </div>
@@ -22,8 +20,20 @@ export default function Home({user}) {
 
 
 export async function getServerSideProps({params}){
-  const req = await axios.get(`/user/${params.user}`)
-  const data =req.data
+  try {
+    const res = await fetch(`https://api.vdev.in/user/${params.user}`)
+    var data = await res.json()
+  } catch (error) {
+    console.log(error)
+  }
+  if (!data) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
   return{
     props:{user : data}
   }
